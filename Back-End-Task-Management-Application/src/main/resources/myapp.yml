@@ -1,0 +1,198 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Task Management Application
+  description: Tasks Information
+tags:
+  - name: Task
+    description: 'CRUD EndPoints'
+paths:
+  /v1/getTask:
+    post:
+      summary: Get Task
+      operationId: getTask
+      tags:
+        - Task
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/GetTaskRequest"
+      responses:
+        '200':
+          description: Task Details
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/GetTaskResponse"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/getAllTasks:
+    post:
+      summary: Get All Tasks
+      operationId: getAllTasks
+      tags:
+        - Task
+      responses:
+        '200':
+          description: Respresentation of all Tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetTaskResponse'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/saveTask:
+    post:
+      summary: Save Task
+      operationId: saveTask
+      tags:
+        - Task
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/SaveTaskRequest"
+      responses:
+        '200':
+          description: Status of Task save
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/SaveTaskResponse"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/updateTask:
+    post:
+      summary: Update Task
+      operationId: updateTask
+      tags:
+        - Task
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTaskRequest"
+      responses:
+        '200':
+          description: Status of Task update
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/UpdateTaskResponse"
+  /v1/deleteTask:
+    post:
+      summary: Delete Task
+      operationId: deleteTask
+      tags:
+        - Task
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteTaskRequest"
+      responses:
+        '200':
+          description: Status of Task delete
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/DeleteTaskResponse"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:  
+  schemas:
+    GetTaskRequest:
+         required:
+           - taskId
+         properties:
+           taskId:
+             type: integer
+    GetTaskResponse:
+      properties:
+         taskId:
+            type: integer
+         title:
+             type: string
+         description:
+             type: string
+         status:
+            type: string
+    SaveTaskRequest:
+         properties:
+           title:
+             type: string
+           description:
+             type: string
+           status:
+             type: string
+    SaveTaskResponse:
+      properties:
+        message:
+          type: string
+    UpdateTaskRequest:
+       properties:
+         taskId:
+            type: integer
+         title:
+             type: string
+         description:
+             type: string
+         status:
+             type: string
+    UpdateTaskResponse:
+      properties:
+        message:
+          type: string
+    DeleteTaskRequest:
+         required:
+           - taskId
+         properties:
+           taskId:
+             type: integer
+    DeleteTaskResponse:
+      properties:
+        message:
+          type: string
+    AuthRequest:
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    AuthResponse:
+      properties:
+        accessToken:
+          type: string
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string

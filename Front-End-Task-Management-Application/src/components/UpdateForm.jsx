@@ -17,16 +17,13 @@ export const UpdateForm = (props) => {
   const myFormSubmit = (event) => {
     event.preventDefault();
     const authHeader = { headers: { Authorization: 'Bearer ' + localStorage.getItem('accessToken') } };
-    axios.post(process.env.REACT_APP_UpdateTask_URL, formData, authHeader)
+    axios.put(process.env.REACT_APP_UpdateTask_URL, formData, authHeader)
       .then((response) => {
         props.getAllTasks();
-        if(response.data.message === 'Successfully Updated'){
-          toast.success(response.data.message); 
-      }else{
-          toast.error(response.data.message);
-      }
+          toast.success(response.data); 
       }, (error) => {
-        console.log(error);
+        toast.error(error.response.data);
+        console.log(error.response.data);
       });
   }
 

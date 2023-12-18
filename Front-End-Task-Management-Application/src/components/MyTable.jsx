@@ -52,7 +52,7 @@ export const MyTable = (props) => {
 
   const getAllTasks = () => {
     const authHeader = { headers: { Authorization: 'Bearer ' + localStorage.getItem('accessToken') } };
-    axios.post(process.env.REACT_APP_GetAllTask_URL, {}, authHeader)
+    axios.get(process.env.REACT_APP_GetAllTask_URL, authHeader)
       .then((response) => {
         setTaskDetails(response.data);
         setCurrentForm('');
@@ -62,12 +62,21 @@ export const MyTable = (props) => {
   }
 
   const removeRecord = (taskId) => {
-  const authHeader = { headers: { Authorization: 'Bearer ' + localStorage.getItem('accessToken') } };
-    axios.post(process.env.REACT_APP_DeleteTask_URL, { "taskId": taskId }, authHeader)
+    const headerAndPayload = { headers: { Authorization: 'Bearer ' + localStorage.getItem('accessToken') } };
+    axios.delete(process.env.REACT_APP_DeleteTask_URL + taskId, headerAndPayload)
       .then((response) => {
         getAllTasks();
-        toast.success("Successfully Deleted");
+        if (response.status === 204) {
+          toast.success("Successfully Deleted");
+        }
+        if (response.status === 404) {
+          toast.error("No records found for deletion");
+        }
+        if (response.status === 500) {
+          toast.error("Delete failed due to internal error");
+        }
       }, (error) => {
+        toast.error("Delete failed due to internal error");
         console.log(error);
       });
   }

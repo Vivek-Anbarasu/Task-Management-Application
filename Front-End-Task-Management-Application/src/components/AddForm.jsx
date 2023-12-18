@@ -30,14 +30,10 @@ export const AddForm = (props) => {
     axios.post(process.env.REACT_APP_SaveTask_URL, data, authHeader)
       .then((response) => {
         props.getAllTasks();
-        if(response.data.message === 'Successfully Saved'){
-          toast.success(response.data.message); 
-      }else{
-          toast.error(response.data.message);
-      }
+        toast.success(response.data); 
       }, (error) => {
-        toast.error("Save failed due to internal error");
-        console.log(error);
+        toast.error(error.response.data);
+        console.log(error.response.data);
       });
   }
 

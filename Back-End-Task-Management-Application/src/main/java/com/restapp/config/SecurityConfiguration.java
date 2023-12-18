@@ -16,6 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.restapp.filter.JwtAuthFilter;
 import com.restapp.service.UserInfoUserDetailsService;
@@ -34,6 +36,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests()
                 .requestMatchers("/user/**","/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .and()
+                .cors()
+                .and()
                 .authorizeHttpRequests().requestMatchers("/v1/**")
                 .authenticated().and()
                 .sessionManagement()
@@ -43,6 +47,16 @@ public class SecurityConfiguration {
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+    
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**").allowedOrigins("http://localhost:3000");
+			}
+		};
+	}
 
     @Bean
     public AuthenticationProvider authenticationProvider(){

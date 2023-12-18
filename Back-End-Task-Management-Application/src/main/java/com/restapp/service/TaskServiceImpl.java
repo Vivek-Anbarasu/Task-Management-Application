@@ -10,10 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.rest.GetTaskResponse;
-import com.rest.SaveTaskRequest;
-import com.rest.UpdateTaskRequest;
+
 import com.restapp.dao.TaskRepository;
+import com.restapp.dto.GetTaskResponse;
+import com.restapp.dto.SaveTaskRequest;
+import com.restapp.dto.UpdateTaskRequest;
 import com.restapp.entity.Task;
 
 

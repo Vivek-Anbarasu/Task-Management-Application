@@ -5,148 +5,140 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rest.DeleteTaskRequest;
-import com.rest.DeleteTaskResponse;
-import com.rest.GetTaskRequest;
-import com.rest.GetTaskResponse;
-import com.rest.SaveTaskRequest;
-import com.rest.SaveTaskResponse;
-import com.rest.TaskApi;
-import com.rest.UpdateTaskRequest;
-import com.rest.UpdateTaskResponse;
+import com.restapp.dto.GetTaskResponse;
+import com.restapp.dto.SaveTaskRequest;
+import com.restapp.dto.UpdateTaskRequest;
 import com.restapp.entity.Task;
-import com.restapp.exception.ApplicationException;
 import com.restapp.service.TaskService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "http://localhost:3000/")
+@RequestMapping("/v1")
+@CrossOrigin(origins = {"http://localhost:8080","http://localhost:3000"})
 @Slf4j
-public class TaskManagementController implements TaskApi {
+public class TaskManagementController{
 
 	@Autowired
 	private TaskService taskService;
 
-	@Override
-	public ResponseEntity<GetTaskResponse> getTask(GetTaskRequest getRequest) {
+	@GetMapping("/getTask/{taskId}")
+	public ResponseEntity<GetTaskResponse> getTask(@NotNull(message="TaskId is mandatory") @PathVariable("taskId") Integer taskId) {
 		GetTaskResponse getResponse = null;
 		try {
-			getResponse = taskService.getTask(getRequest.getTaskId());
+			getResponse = taskService.getTask(taskId);
+			if (getResponse == null) {
+				log.error("No records found for taskId = " + taskId);
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}else {
+				return new ResponseEntity<>(getResponse, HttpStatus.OK);
+			}
 		} catch (Exception e) {
 			log.error("Error in getTask", e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		if (getResponse == null) {
-			log.error("No records found for taskId = " + getRequest.getTaskId());
-			throw new ApplicationException(HttpStatus.BAD_REQUEST,
-					"No records found for taskId = " + getRequest.getTaskId());
-		}
-		return new ResponseEntity<>(getResponse, HttpStatus.OK);
 	}
 
-	@Override
-	public ResponseEntity<SaveTaskResponse> saveTask(SaveTaskRequest saveRequest) {
+	@PostMapping("/saveTask")
+	public ResponseEntity<String> saveTask(@Valid @RequestBody SaveTaskRequest saveRequest) {
 		boolean response = false;
-		SaveTaskResponse saveResponse = null;
 		try {
-			if (ObjectUtils.isEmpty(saveRequest.getTitle()) || ObjectUtils.isEmpty(saveRequest.getStatus())) {
-				throw new ApplicationException(HttpStatus.BAD_REQUEST, "Task Title and Status is mandatory");
-			}
 			if (taskService.findByTitle(saveRequest.getTitle())) {
-				saveResponse = new SaveTaskResponse();
-				saveResponse.setMessage("Title already exists: " + saveRequest.getTitle());
 				log.error("Title already exists: " + saveRequest.getTitle());
-				return new ResponseEntity<>(saveResponse, HttpStatus.OK);
+				return new ResponseEntity<>("Title already exists", HttpStatus.BAD_REQUEST);
 			} else {
 				response = taskService.saveTask(saveRequest);
+				if (!response) {
+					log.error("Failed to saveTask"+saveRequest.getTitle());
+					return new ResponseEntity<>("Failed to save", HttpStatus.INTERNAL_SERVER_ERROR);
+				}else {
+					log.error("Successfully Saved"+saveRequest.getTitle());
+					return new ResponseEntity<>("Successfully Saved", HttpStatus.OK);
+				}
 			}
 		} catch (Exception e) {
-			log.error("Error in saveTask", e);
-		}
-		if (response) {
-			saveResponse = new SaveTaskResponse();
-			saveResponse.setMessage("Successfully Saved");
-			log.info("Successfully Saved: " + saveRequest.getTitle());
-			return new ResponseEntity<>(saveResponse, HttpStatus.OK);
-		} else {
-			saveResponse = new SaveTaskResponse();
-			saveResponse.setMessage("Failed to save");
-			log.info("Failed to save: " + saveRequest.getTitle());
-			return new ResponseEntity<>(saveResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("Failed to saveTask", e);
+			return new ResponseEntity<>("Failed to save", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@Override
-	public ResponseEntity<UpdateTaskResponse> updateTask(UpdateTaskRequest updateRequest) {
+	@PutMapping("/updateTask")
+	public ResponseEntity<String> updateTask(@Valid @RequestBody UpdateTaskRequest updateRequest) {
 		boolean response = false;
-		UpdateTaskResponse updateResponse = null;
 		try {
-			if (ObjectUtils.isEmpty(updateRequest.getTaskId()) || ObjectUtils.isEmpty(updateRequest.getStatus())) {
-				throw new ApplicationException(HttpStatus.BAD_REQUEST, "Task Title and Status is mandatory");
-			}
 			Task task = taskService.findByTitleTask(updateRequest.getTitle());
-			if (task !=  null && (task.getTaskId().intValue() != updateRequest.getTaskId().intValue())) {
-				updateResponse = new UpdateTaskResponse();
-				updateResponse.setMessage("Title already exists: " + updateRequest.getTitle());
+			if (task != null && (task.getTaskId().intValue() != updateRequest.getTaskId().intValue())) {
 				log.error("Title already exists: " + updateRequest.getTitle());
-				return new ResponseEntity<>(updateResponse, HttpStatus.OK);
+				return new ResponseEntity<>("Title already exists", HttpStatus.BAD_REQUEST);
 			} else {
-			response = taskService.updateTask(updateRequest);
+				response = taskService.updateTask(updateRequest);
+				if (response) {
+					log.info("Succesfully Updated: " + updateRequest.getTitle());
+					return new ResponseEntity<>("Successfully Updated", HttpStatus.OK);
+				} else {
+					log.error("No records found for taskId = " + updateRequest.getTaskId());
+					return new ResponseEntity<>("No records found for taskId = " + updateRequest.getTaskId(),HttpStatus.NOT_FOUND);
+				}
 			}
 		} catch (Exception e) {
-			log.error("Error in updateTask", e);
-		}
-		if (response) {
-			updateResponse = new UpdateTaskResponse();
-			updateResponse.setMessage("Successfully Updated");
-			log.info("Succesfully Updated: " + updateRequest.getTitle());
-			return new ResponseEntity<>(updateResponse, HttpStatus.OK);
-		} else {
-			log.error("No records found for getTaskId = " + updateRequest.getTaskId());
-			throw new ApplicationException(HttpStatus.BAD_REQUEST,
-					"No records found for getTaskId = " + updateRequest.getTaskId());
+			log.error("Failed to update Task", e);
+			return new ResponseEntity<>("Failed to update task", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@Override
-	public ResponseEntity<DeleteTaskResponse> deleteTask(DeleteTaskRequest deleteRequest) {
-		boolean response = false;
+	@DeleteMapping("/deleteTask/{taskId}")
+	public ResponseEntity<Void> deleteTask(@NotNull(message="TaskId is mandatory") @PathVariable("taskId") Integer taskId) {
+		boolean response;
+		GetTaskResponse getResponse = null;
 		try {
-			response = taskService.deleteTask(deleteRequest.getTaskId());
+			getResponse = taskService.getTask(taskId);
+			if (getResponse == null) {
+				log.error("No records found for taskId = " + taskId);
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			} else {
+				response = taskService.deleteTask(taskId);
+				if (!response) {
+					log.error("Error in deleteTask");
+					return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+				}else {
+					log.info("Succesfully Deleted :" + taskId);
+					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				}
+			}
 		} catch (Exception e) {
-			log.error("Error in updateTask", e);
-		}
-		if (response) {
-			DeleteTaskResponse deleteResponse = new DeleteTaskResponse();
-			deleteResponse.setMessage("Succesfully Deleted");
-			log.info("Succesfully Deleted :" + deleteRequest.getTaskId());
-			return new ResponseEntity<>(deleteResponse, HttpStatus.OK);
-		} else {
-			log.error("No records found for getTaskId = " + deleteRequest.getTaskId());
-			throw new ApplicationException(HttpStatus.BAD_REQUEST,
-					"No records found for getTaskId = " + deleteRequest.getTaskId());
+			log.error("Error in deleteTask", e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@Override
+	@GetMapping("/getAllTasks")
 	public ResponseEntity<List<GetTaskResponse>> getAllTasks() {
 		List<GetTaskResponse> responseList = null;
 		try {
 			responseList = taskService.getAllTasks();
 			if (responseList == null) {
 				log.info("No records found");
-				throw new ApplicationException(HttpStatus.BAD_REQUEST, "No records found ");
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}else {
+				return new ResponseEntity<>(responseList, HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			log.error("Error in updateTask", e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<>(responseList, HttpStatus.OK);
 	}
-
 }

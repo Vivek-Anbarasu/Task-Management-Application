@@ -9,7 +9,7 @@ import com.restapp.entity.Task;
 
 public interface TaskService 
 {
-	boolean saveTask(SaveTaskRequest saveRequest) throws Exception;
+	int saveTask(SaveTaskRequest saveRequest) throws Exception;
 
 	GetTaskResponse getTask(Integer TaskId)throws Exception;
 

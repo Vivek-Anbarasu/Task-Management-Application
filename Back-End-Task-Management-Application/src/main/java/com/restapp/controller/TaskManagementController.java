@@ -55,19 +55,19 @@ public class TaskManagementController{
 
 	@PostMapping("/saveTask")
 	public ResponseEntity<String> saveTask(@Valid @RequestBody SaveTaskRequest saveRequest) {
-		boolean response = false;
+		int taskId;
 		try {
 			if (taskService.findByTitle(saveRequest.getTitle())) {
 				log.error("Title already exists: " + saveRequest.getTitle());
 				return new ResponseEntity<>("Title already exists", HttpStatus.BAD_REQUEST);
 			} else {
-				response = taskService.saveTask(saveRequest);
-				if (!response) {
+				taskId = taskService.saveTask(saveRequest);
+				if (taskId == 0) {
 					log.error("Failed to saveTask"+saveRequest.getTitle());
 					return new ResponseEntity<>("Failed to save", HttpStatus.INTERNAL_SERVER_ERROR);
 				}else {
-					log.error("Successfully Saved"+saveRequest.getTitle());
-					return new ResponseEntity<>("Successfully Saved", HttpStatus.OK);
+					log.info("Successfully Saved"+saveRequest.getTitle());
+					return new ResponseEntity<>(String.valueOf(taskId), HttpStatus.OK);
 				}
 			}
 		} catch (Exception e) {

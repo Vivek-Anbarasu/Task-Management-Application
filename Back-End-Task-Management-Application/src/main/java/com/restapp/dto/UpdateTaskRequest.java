@@ -23,7 +23,7 @@ public class UpdateTaskRequest {
 
   @NotNull(message = "Status is mandatory")
   @NotEmpty(message = "Status is mandatory")
-  @StatusValidator(message = "Status must be either To Do or In Progress or Done")
+ // @StatusValidator(message = "Status must be either To Do or In Progress or Done")
   private String status;
 
 }

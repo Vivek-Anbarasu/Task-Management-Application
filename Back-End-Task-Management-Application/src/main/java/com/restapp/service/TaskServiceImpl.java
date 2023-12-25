@@ -26,13 +26,13 @@ public class TaskServiceImpl implements TaskService {
 	
 	@Override
 	@Transactional
-	public boolean saveTask(SaveTaskRequest saveRequest) throws Exception {
+	public int saveTask(SaveTaskRequest saveRequest) throws Exception {
 		Task task = new Task();
 		task.setTitle(saveRequest.getTitle());
 		task.setDescription(saveRequest.getDescription());
 		task.setStatus(saveRequest.getStatus());
-		taskRepository.save(task);
-		return true;
+		Task savedTask = taskRepository.save(task);
+		return savedTask.getTaskId();
 	}
 
 	@Override

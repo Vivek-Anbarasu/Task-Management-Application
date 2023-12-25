@@ -6,21 +6,22 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 
 export const Register = (props) => {
+
     const registerApplication = async (data) => {
-        axios.post(process.env.REACT_APP_Reg_URL, {name: data.username,password: data.password,
-            email: data.email,roles: 'ROLE_ADMIN'})
-        .then((response) => {
-            if(response.data === 'User Succesfully Registered'){
-                toast.success(response.data); 
-                props.onFormSwitch('login');
-            }else{
-                toast.error(response.data);
-            }
-          }, (error) => {
-            console.log(error);
-            toast.error("Registeration Failed");
-          });
-    }
+      try {
+        const response = await axios.post(process.env.REACT_APP_Reg_URL, {name: data.username,password: data.password,
+          email: data.email,roles: 'ROLE_ADMIN'});
+          if(response.data === 'User Succesfully Registered'){
+            toast.success(response.data); 
+            props.onFormSwitch('login');
+        }else{
+            toast.error(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error("Registeration Failed");
+      }
+    };
 
     const schema = Yup.object().shape({
         username: Yup.string().required("Please enter your username").min(3, "Must Contain 3 Characters").max(100, "Cannot exceed 100 characters"),

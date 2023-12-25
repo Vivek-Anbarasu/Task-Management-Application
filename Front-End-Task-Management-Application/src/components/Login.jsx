@@ -13,17 +13,17 @@ export const Login = (props) => {
     localStorage.setItem('userName','');
 
     const loginApplication = async (data) => {
-          axios.post(process.env.REACT_APP_Auth_URL, {username: data.username,password: data.password})
-          .then((response) => {
-              localStorage.setItem('accessToken',response.data.accessToken); 
-              localStorage.setItem('userName',data.username); 
-              toast.success("Successfully Logged In");
-              navigate("/Table");
-            }, (error) => {
-              console.log(error);
-              toast.error("Invalid Credentials");
-            });
+      try {
+        const response = await axios.post(process.env.REACT_APP_Auth_URL, {username: data.username,password: data.password});
+        localStorage.setItem('accessToken',response.data.accessToken); 
+        localStorage.setItem('userName',data.username); 
+        toast.success("Successfully Logged In");
+        navigate("/Table"); 
+      } catch (error) {
+        console.log(error);
+        toast.error("Invalid Credentials");
       }
+    };
 
     const schema = Yup.object().shape({
         username: Yup.string().required("Please enter your username"),

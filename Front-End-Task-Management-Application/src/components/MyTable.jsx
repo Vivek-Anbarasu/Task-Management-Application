@@ -1,11 +1,12 @@
-import React, { useEffect, useState,useMemo } from 'react';
+import React, { useEffect, useState,createContext } from 'react';
 import '../css/table.css';
 import { AddForm } from './AddForm';
 import { UpdateForm } from './UpdateForm';
+
 import axios from 'axios';
 import toast from "react-hot-toast";
 import { useNavigate } from 'react-router-dom'; 
-
+import TaskContext from "./TaskContext";
 import BootstrapTable from 'react-bootstrap-table-next';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.css';
@@ -15,15 +16,18 @@ import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css
 import filterFactory, {textFilter} from "react-bootstrap-table2-filter";
 
 
-
-export const MyTable = (props) => {
+export const MyTable = () => {
   const [currentForm, setCurrentForm] = useState('');
   const [editedRecord, setEditedRecord] = useState();
   const [taskDetails, setTaskDetails] = useState([]);
   const navigate = useNavigate();
- 
-  const toggleForm = (formName) => {
-    setCurrentForm(formName);
+
+  const setTask = (data) =>{
+    setTaskDetails(data);
+  }
+
+  const resetForm = () =>{
+    setCurrentForm('');
   }
 
   const logOut = () => {
@@ -44,42 +48,37 @@ export const MyTable = (props) => {
 
   useEffect(() => {
     if(localStorage.getItem('accessToken') === ''){
-      navigate("/");
+      logOut();
     }else{
       getAllTasks();
     }
   }, []);
 
-  const getAllTasks = () => {
-    const authHeader = { headers: { Authorization: 'Bearer ' + localStorage.getItem('accessToken') } };
-    axios.get(process.env.REACT_APP_GetAllTask_URL, authHeader)
-      .then((response) => {
-        setTaskDetails(response.data);
-        setCurrentForm('');
-      }, (error) => {
-        console.log(error);
-      });
-  }
+  const getAllTasks = async () => {
+    try {
+      const authHeader = { headers: { Authorization: 'Bearer ' + localStorage.getItem('accessToken') } };
+      const response = await axios.get(process.env.REACT_APP_GetAllTask_URL, authHeader);
+      setTaskDetails(response.data);
+      resetForm();
+    } catch (error) {
+      console.error('Error getting tasks:', error);
+    }
+  };
 
-  const removeRecord = (taskId) => {
-    const headerAndPayload = { headers: { Authorization: 'Bearer ' + localStorage.getItem('accessToken') } };
-    axios.delete(process.env.REACT_APP_DeleteTask_URL + taskId, headerAndPayload)
-      .then((response) => {
-        getAllTasks();
-        if (response.status === 204) {
-          toast.success("Successfully Deleted");
-        }
-        if (response.status === 404) {
-          toast.error("No records found for deletion");
-        }
-        if (response.status === 500) {
-          toast.error("Delete failed due to internal error");
-        }
-      }, (error) => {
-        toast.error("Delete failed due to internal error");
-        console.log(error);
-      });
-  }
+  const removeRecord = async (taskId) => {
+    try {
+      const authHeader = { headers: { Authorization: 'Bearer ' + localStorage.getItem('accessToken') } };
+      const response = await axios.delete(process.env.REACT_APP_DeleteTask_URL + taskId, authHeader);
+      if (response.status === 204) {
+        const updatedTasks = taskDetails.filter((task) => task.taskId !== taskId);
+        setTaskDetails(updatedTasks);
+        toast.success("Successfully Deleted");
+      }
+    } catch (error) {
+      toast.error("Delete failed due to internal error");
+      console.error('Error deleting task:', error);
+    }
+  };
 
   const editButton = (cell, row, rowIndex, formatExtraData) => {
     return (
@@ -114,24 +113,25 @@ export const MyTable = (props) => {
     nextPageText:">",prePageText: "<",alwaysShowAllBtns: true,showTotal: true
   });
 
-  if(currentForm === 'Update'){setCurrentForm(<UpdateForm getAllTasks={getAllTasks} getEditedRecord={getEditedRecord}/>)}
+  if(currentForm === 'Update'){setCurrentForm(<UpdateForm taskDetails = {taskDetails} setTask={setTask} getEditedRecord={getEditedRecord}/>)}
 
-  return (<div>
+  return (
+  <TaskContext.Provider value={{resetForm}}>
+  <div>
   <div style={{ 'paddingLeft': '450px' }}>
   <b>{localStorage.getItem('userName')}</b><br/> 
     <button className="button-3" onClick={() => logOut() }>Log Out</button>
   </div>
   <div>
   <div style={{'paddingBottom': '10px', 'paddingRight': '350px', 'fontSize': '20px', 'color': '#c9f3f5' }}>
-  <b>Task Management Application   </b><button className="button-4" onClick={() => toggleForm(<AddForm getAllTasks={getAllTasks}/>)} >Add</button></div>
+  <b>Task Management Application   </b><button className="button-4" onClick={() => setCurrentForm(<AddForm taskDetails = {taskDetails} setTask={setTask}/>)} >Add</button></div>
     <div style={{'paddingBottom': '10px', 'paddingRight': '250px','paddingLeft': '100px', 'fontSize': '20px', 'color': '#c9f3f5' }}>
     <BootstrapTable bootstrap4 keyField="taskId" columns={columns} data={taskDetails} pagination={pagination} filter={filterFactory()} />
-      </div> 
-     
-    
+    </div> 
     {currentForm}
   </div>
   </div>
+   </TaskContext.Provider> 
   )
 }
 

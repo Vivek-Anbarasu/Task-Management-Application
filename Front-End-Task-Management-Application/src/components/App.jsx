@@ -1,13 +1,13 @@
 import { Toaster } from "react-hot-toast"; 
-import {PageNotFound} from './components/PageNotFound';
-import {MyTable} from './components/MyTable';
+import {PageNotFound} from './PageNotFound';
+import {MyTable} from './MyTable';
 import { BrowserRouter,Routes, Route  } from 'react-router-dom'; 
 import React, { useState } from "react";
-import './css/App.css';
-import { Login } from "./components/Login";
-import { Register } from "./components/Register";
+import '../css/App.css';
+import { Login } from "./Login";
+import { Register } from "./Register";
 
-function App() {
+export const App = () => {
 
   const [currentForm, setCurrentForm] = useState('login');
 
@@ -30,5 +30,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

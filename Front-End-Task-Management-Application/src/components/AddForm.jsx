@@ -27,7 +27,7 @@ export const AddForm = (props) => {
     try {
       const authHeader = { headers: { Authorization: 'Bearer ' + localStorage.getItem('accessToken') } };
       const response = await axios.post(process.env.REACT_APP_SaveTask_URL, data, authHeader);
-      if (response.status === 200) {
+      if (response.status === 201) {
       data["taskId"] = response.data;
       const newTaskList = [...props.taskDetails, data]
       props.setTask(newTaskList);

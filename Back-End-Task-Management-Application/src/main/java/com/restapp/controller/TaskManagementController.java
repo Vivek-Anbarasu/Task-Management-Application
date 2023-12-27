@@ -57,7 +57,8 @@ public class TaskManagementController{
 	public ResponseEntity<String> saveTask(@Valid @RequestBody SaveTaskRequest saveRequest) {
 		int taskId;
 		try {
-			if (taskService.findByTitle(saveRequest.getTitle())) {
+			Task task = taskService.findByTitle(saveRequest.getTitle());
+			if (task != null) {
 				log.error("Title already exists: " + saveRequest.getTitle());
 				return new ResponseEntity<>("Title already exists", HttpStatus.BAD_REQUEST);
 			} else {
@@ -67,7 +68,7 @@ public class TaskManagementController{
 					return new ResponseEntity<>("Failed to save", HttpStatus.INTERNAL_SERVER_ERROR);
 				}else {
 					log.info("Successfully Saved"+saveRequest.getTitle());
-					return new ResponseEntity<>(String.valueOf(taskId), HttpStatus.OK);
+					return new ResponseEntity<>(String.valueOf(taskId), HttpStatus.CREATED);
 				}
 			}
 		} catch (Exception e) {
@@ -80,7 +81,7 @@ public class TaskManagementController{
 	public ResponseEntity<String> updateTask(@Valid @RequestBody UpdateTaskRequest updateRequest) {
 		boolean response = false;
 		try {
-			Task task = taskService.findByTitleTask(updateRequest.getTitle());
+			Task task = taskService.findByTitle(updateRequest.getTitle());
 			if (task != null && (task.getTaskId().intValue() != updateRequest.getTaskId().intValue())) {
 				log.error("Title already exists: " + updateRequest.getTitle());
 				return new ResponseEntity<>("Title already exists", HttpStatus.BAD_REQUEST);

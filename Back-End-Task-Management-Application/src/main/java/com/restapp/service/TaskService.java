@@ -19,7 +19,5 @@ public interface TaskService
 	
 	List<GetTaskResponse> getAllTasks() throws Exception;
 	
-	boolean findByTitle(String title) throws Exception;
-	
-	Task findByTitleTask(String title) throws Exception;
+	Task findByTitle(String title) throws Exception;
 }

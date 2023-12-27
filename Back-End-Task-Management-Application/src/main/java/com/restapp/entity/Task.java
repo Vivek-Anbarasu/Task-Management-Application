@@ -9,15 +9,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 
 @Entity
 @Table(name = "Tasks")
-@Getter @Setter
+@Getter @Setter @EqualsAndHashCode 
 public class Task implements Serializable {
-
 
 	private static final long serialVersionUID = 1L;
 	

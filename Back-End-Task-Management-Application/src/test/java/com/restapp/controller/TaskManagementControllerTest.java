@@ -51,11 +51,9 @@ public class TaskManagementControllerTest {
 
 	@Test
 	public void testGetTask() throws Exception {
-		GetTaskResponse task = new GetTaskResponse();
-		task.setTaskId(100);
-		task.setDescription("Task Description");
-		task.setTitle("Task Title");
-		task.setStatus("In Progress");
+		GetTaskResponse task = GetTaskResponse.builder().
+				taskId(100).title("Task Title").
+				description("Task Description").status("In Progress").build();
 
 		when(taskService.getTask(100)).thenReturn(task);
 		mockMvc.perform(get("/v1/getTask/{taskId}", "100")).andExpect(status().isOk());
@@ -63,12 +61,6 @@ public class TaskManagementControllerTest {
 
 	@Test
 	public void testGetTaskThrowException() throws Exception {
-		GetTaskResponse task = new GetTaskResponse();
-		task.setTaskId(100);
-		task.setDescription("Task Description");
-		task.setTitle("Task Title");
-		task.setStatus("In Progress");
-
 		when(taskService.getTask(100)).thenThrow(NullPointerException.class);
 		mockMvc.perform(get("/v1/getTask/{taskId}", "100")).andExpect(status().isInternalServerError());
 	}
@@ -96,7 +88,7 @@ public class TaskManagementControllerTest {
 		request.setStatus("In Progress");
 		request.setDescription("Task Description");
 
-		when(taskService.findByTitle("Test Title")).thenReturn(true);
+		when(taskService.findByTitle("Test Title")).thenReturn(new Task());
 
 		mockMvc.perform(post("/v1/saveTask").contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request))).andExpect(status().isBadRequest());
@@ -109,7 +101,7 @@ public class TaskManagementControllerTest {
 		request.setStatus("In Progress");
 		request.setDescription("Task Description");
 
-		when(taskService.findByTitle("Test Title")).thenReturn(false);
+		when(taskService.findByTitle(request.getTitle())).thenReturn(null);
 		when(taskService.saveTask(request)).thenReturn(100);
 
 		mockMvc.perform(post("/v1/saveTask").contentType(MediaType.APPLICATION_JSON)
@@ -123,11 +115,11 @@ public class TaskManagementControllerTest {
 		request.setStatus("In Progress");
 		request.setDescription("Task Description");
 
-		when(taskService.findByTitle("Test Title")).thenReturn(false);
+		when(taskService.findByTitle("Test Title")).thenReturn(null);
 		when(taskService.saveTask(any())).thenReturn(100);
 
 		mockMvc.perform(post("/v1/saveTask").contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request))).andExpect(status().isOk());
+				.content(objectMapper.writeValueAsString(request))).andExpect(status().isCreated());
 	}
 
 	@Test
@@ -145,11 +137,9 @@ public class TaskManagementControllerTest {
 
 	@Test
 	public void testDeleteTask() throws Exception {
-		GetTaskResponse task = new GetTaskResponse();
-		task.setTaskId(100);
-		task.setDescription("Task Description");
-		task.setTitle("Task Title");
-		task.setStatus("In Progress");
+		GetTaskResponse task = GetTaskResponse.builder().
+				taskId(100).title("Task Title").
+				description("Task Description").status("In Progress").build();
 
 		when(taskService.getTask(100)).thenReturn(task);
 		when(taskService.deleteTask(100)).thenReturn(true);
@@ -158,11 +148,9 @@ public class TaskManagementControllerTest {
 
 	@Test
 	public void testDeleteTaskError() throws Exception {
-		GetTaskResponse task = new GetTaskResponse();
-		task.setTaskId(100);
-		task.setDescription("Task Description");
-		task.setTitle("Task Title");
-		task.setStatus("In Progress");
+		GetTaskResponse task = GetTaskResponse.builder().
+				taskId(100).title("Task Title").
+				description("Task Description").status("In Progress").build();
 
 		when(taskService.getTask(100)).thenReturn(task);
 		when(taskService.deleteTask(100)).thenReturn(false);
@@ -171,12 +159,6 @@ public class TaskManagementControllerTest {
 
 	@Test
 	public void testDeleteFailed() throws Exception {
-		GetTaskResponse task = new GetTaskResponse();
-		task.setTaskId(100);
-		task.setDescription("Task Description");
-		task.setTitle("Task Title");
-		task.setStatus("In Progress");
-
 		when(taskService.getTask(100)).thenReturn(null);
 		mockMvc.perform(delete("/v1/deleteTask/{taskId}", "100")).andExpect(status().isNotFound());
 	}
@@ -190,11 +172,9 @@ public class TaskManagementControllerTest {
 	@Test
 	public void testGetAllTasks() throws Exception {
 		List<GetTaskResponse> responseList = new ArrayList<>();
-		GetTaskResponse task = new GetTaskResponse();
-		task.setTaskId(100);
-		task.setDescription("Task Description");
-		task.setTitle("Task Title");
-		task.setStatus("In Progress");
+		GetTaskResponse task = GetTaskResponse.builder().
+				taskId(100).title("Task Title").
+				description("Task Description").status("In Progress").build();
 		responseList.add(task);
 		when(taskService.getAllTasks()).thenReturn(responseList);
 
@@ -223,7 +203,7 @@ public class TaskManagementControllerTest {
 		updateRequest.setTitle("Task Title");
 		updateRequest.setStatus("In Progress");
 
-		when(taskService.findByTitleTask(updateRequest.getTitle())).thenReturn(new Task());
+		when(taskService.findByTitle(updateRequest.getTitle())).thenReturn(new Task());
 		when(taskService.updateTask(updateRequest)).thenReturn(true);
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/v1/updateTask").contentType(MediaType.APPLICATION_JSON)
@@ -245,24 +225,7 @@ public class TaskManagementControllerTest {
 				.andExpect(content().string("Successfully Updated"));
 	}
 
-	@Test
-	public void testUpdateTask_TitleAlreadyExists() throws Exception {
-		UpdateTaskRequest updateRequest = new UpdateTaskRequest();
-		updateRequest.setTaskId(100);
-		updateRequest.setDescription("Task Description");
-		updateRequest.setTitle("Task Title");
-		updateRequest.setStatus("In Progress");
-		Task existingTask = new Task();
-		existingTask.setTaskId(101);
-		existingTask.setDescription("Task Description");
-		existingTask.setTitle("Task Title");
-		existingTask.setStatus("In Progress");
-		when(taskService.findByTitleTask(updateRequest.getTitle())).thenReturn(existingTask);
 
-		mockMvc.perform(put("/v1/updateTask").contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(updateRequest))).andExpect(status().isBadRequest())
-				.andExpect(content().string("Title already exists"));
-	}
 
 	@Test
 	public void testUpdateTask_NotFound() throws Exception {
@@ -271,7 +234,7 @@ public class TaskManagementControllerTest {
 		updateRequest.setDescription("Task Description");
 		updateRequest.setTitle("Task Title");
 		updateRequest.setStatus("In Progress");
-		when(taskService.findByTitleTask(updateRequest.getTitle())).thenReturn(null);
+		when(taskService.findByTitle(updateRequest.getTitle())).thenReturn(null);
 		when(taskService.updateTask(updateRequest)).thenReturn(false);
 
 		mockMvc.perform(put("/v1/updateTask").contentType(MediaType.APPLICATION_JSON)

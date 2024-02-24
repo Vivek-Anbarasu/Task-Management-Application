@@ -26,24 +26,20 @@ import com.restapp.service.UserInfoUserDetailsService;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
+	
     @Autowired
     private JwtAuthFilter authFilter;
 
   //API Authentication, Authorization
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/user/**","/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                .and()
-                .cors()
-                .and()
-                .authorizeHttpRequests().requestMatchers("/v1/**")
-                .authenticated().and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authenticationProvider(authenticationProvider()) // Authentication
+        return http.csrf(csrf -> csrf.disable())
+        		.authorizeHttpRequests(auth -> auth
+        				.requestMatchers("/user/**","/v3/api-docs/**", "/swagger-ui/**").permitAll()
+        				.requestMatchers("/v1/**")
+                        .authenticated())
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -60,7 +56,7 @@ public class SecurityConfiguration {
 
     @Bean
     public AuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider authenticationProvider=new DaoAuthenticationProvider();
+        var authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;

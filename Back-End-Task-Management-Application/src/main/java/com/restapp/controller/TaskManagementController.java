@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @SecurityRequirement(name = "Bearer Authentication")
 @RequestMapping("/v1")
-@CrossOrigin(origins = {"http://localhost:8080","http://localhost:3000"})
+@CrossOrigin(origins = {"http://localhost:3000"})
 @Slf4j
 public class TaskManagementController{
 

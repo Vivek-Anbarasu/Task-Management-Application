@@ -31,7 +31,7 @@ export const UpdateForm = (props) => {
       toast.success(response.data); 
       }
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response.data.message);
       console.error('Error Updating task:', error);
     }
   };

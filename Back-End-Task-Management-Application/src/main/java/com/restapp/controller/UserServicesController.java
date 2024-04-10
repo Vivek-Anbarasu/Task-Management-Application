@@ -3,6 +3,7 @@ package com.restapp.controller;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,7 +31,7 @@ public class UserServicesController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @PostMapping("/new-registration")
+    @PostMapping(path = "/new-registration", produces = MediaType.APPLICATION_JSON_VALUE)
     public String addNewUser(@RequestBody UserInfo userInfo) {
 
     	Optional<UserInfo> optuserInfo = registrationService.findByName(userInfo.getName());
@@ -42,7 +43,7 @@ public class UserServicesController {
         return registrationService.addUser(userInfo);
     }
 
-    @PostMapping("/authenticate")
+    @PostMapping(path = "/authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
     public AuthResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
     	
     	System.out.println("Request recieved "+authRequest.getUsername());

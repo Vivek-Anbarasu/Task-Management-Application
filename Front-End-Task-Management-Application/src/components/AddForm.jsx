@@ -35,7 +35,7 @@ export const AddForm = (props) => {
       toast.success("Successfully Saved"); 
       }
     } catch (error) {
-      toast.error(error.response.data);
+      toast.error(error.response.data.message);
       console.error('Error adding task:', error);
     }
   };

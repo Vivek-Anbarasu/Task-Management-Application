@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,11 +52,21 @@ public class UserServicesController {
         AuthResponse authResponse;
         if (authentication.isAuthenticated()) {
         	authResponse = new AuthResponse();
-        	authResponse.setAccessToken(jwtService.generateToken(authRequest.getUsername()));
+        	authResponse.setAccessToken(jwtService.generateToken(authRequest.getUsername(), authRequest.getPassword()));
         } else {
         	authResponse = new AuthResponse();
         	authResponse.setAccessToken("Credentials not valid");
         }
 		return authResponse;
+    }
+    
+    @PostMapping(path = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AuthResponse refreshToken(@RequestHeader("Token") String jwtToken) {
+    	String subject = jwtService.extractSubject(jwtToken);
+    	String creds[] = subject.split(" ");
+    	AuthRequest authRequest = new AuthRequest();
+    	authRequest.setUsername(creds[0]);
+    	authRequest.setPassword(creds[1]);
+    	return authenticateAndGetToken(authRequest);
     }
 }

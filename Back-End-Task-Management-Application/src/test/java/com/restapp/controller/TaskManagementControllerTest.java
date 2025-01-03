@@ -30,6 +30,8 @@ import com.restapp.filter.JwtAuthFilter;
 import com.restapp.service.JWTService;
 import com.restapp.service.TaskService;
 
+import lombok.SneakyThrows;
+
 @WebMvcTest(TaskManagementController.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class TaskManagementControllerTest {
@@ -50,7 +52,8 @@ public class TaskManagementControllerTest {
 	private JwtAuthFilter jwtAuthFilter;
 
 	@Test
-	public void testGetTask() throws Exception {
+	@SneakyThrows
+	public void testGetTask(){
 		GetTaskResponse task = GetTaskResponse.builder().
 				taskId(100).title("Task Title").
 				description("Task Description").status("In Progress").build();
@@ -60,19 +63,22 @@ public class TaskManagementControllerTest {
 	}
 
 	@Test
-	public void testGetTaskThrowException() throws Exception {
+	@SneakyThrows
+	public void testGetTaskThrowException() {
 		when(taskService.getTask(100)).thenThrow(NullPointerException.class);
 		mockMvc.perform(get("/v1/getTask/{taskId}", "100")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
-	public void testGetTaskNoRecords() throws Exception {
+	@SneakyThrows
+	public void testGetTaskNoRecords(){
 		when(taskService.getTask(100)).thenReturn(null);
 		mockMvc.perform(get("/v1/getTask/{taskId}", "100")).andExpect(status().isNotFound());
 	}
 
 	@Test
-	public void testSaveTaskMandatoryParams() throws Exception {
+	@SneakyThrows
+	public void testSaveTaskMandatoryParams(){
 		SaveTaskRequest request = new SaveTaskRequest();
 		request.setTitle("Test Title");
 		request.setDescription("Task Description");
@@ -82,7 +88,8 @@ public class TaskManagementControllerTest {
 	}
 
 	@Test
-	public void testSaveTaskTitleAlreadyExists() throws Exception {
+	@SneakyThrows
+	public void testSaveTaskTitleAlreadyExists(){
 		SaveTaskRequest request = new SaveTaskRequest();
 		request.setTitle("Test Title");
 		request.setStatus("In Progress");
@@ -95,7 +102,8 @@ public class TaskManagementControllerTest {
 	}
 
 	@Test
-	public void testSaveTaskFailed() throws Exception {
+	@SneakyThrows
+	public void testSaveTaskFailed(){
 		SaveTaskRequest request = new SaveTaskRequest();
 		request.setTitle("Test Title");
 		request.setStatus("In Progress");
@@ -109,7 +117,8 @@ public class TaskManagementControllerTest {
 	}
 
 	@Test
-	public void testSaveTaskSuccess() throws Exception {
+	@SneakyThrows
+	public void testSaveTaskSuccess(){
 		SaveTaskRequest request = new SaveTaskRequest();
 		request.setTitle("Test Title");
 		request.setStatus("In Progress");
@@ -123,7 +132,8 @@ public class TaskManagementControllerTest {
 	}
 
 	@Test
-	public void testSaveTaskException() throws Exception {
+	@SneakyThrows
+	public void testSaveTaskException(){
 		SaveTaskRequest request = new SaveTaskRequest();
 		request.setTitle("Test Title");
 		request.setStatus("In Progress");
@@ -136,7 +146,8 @@ public class TaskManagementControllerTest {
 	}
 
 	@Test
-	public void testDeleteTask() throws Exception {
+	@SneakyThrows
+	public void testDeleteTask(){
 		GetTaskResponse task = GetTaskResponse.builder().
 				taskId(100).title("Task Title").
 				description("Task Description").status("In Progress").build();
@@ -147,7 +158,8 @@ public class TaskManagementControllerTest {
 	}
 
 	@Test
-	public void testDeleteTaskError() throws Exception {
+	@SneakyThrows
+	public void testDeleteTaskError(){
 		GetTaskResponse task = GetTaskResponse.builder().
 				taskId(100).title("Task Title").
 				description("Task Description").status("In Progress").build();
@@ -158,19 +170,22 @@ public class TaskManagementControllerTest {
 	}
 
 	@Test
-	public void testDeleteFailed() throws Exception {
+	@SneakyThrows
+	public void testDeleteFailed(){
 		when(taskService.getTask(100)).thenReturn(null);
 		mockMvc.perform(delete("/v1/deleteTask/{taskId}", "100")).andExpect(status().isNotFound());
 	}
 
 	@Test
-	public void testDeleteException() throws Exception {
+	@SneakyThrows
+	public void testDeleteException(){
 		when(taskService.getTask(100)).thenThrow(NullPointerException.class);
 		mockMvc.perform(delete("/v1/deleteTask/{taskId}", "100")).andExpect(status().isInternalServerError());
 	}
 
 	@Test
-	public void testGetAllTasks() throws Exception {
+	@SneakyThrows
+	public void testGetAllTasks(){
 		List<GetTaskResponse> responseList = new ArrayList<>();
 		GetTaskResponse task = GetTaskResponse.builder().
 				taskId(100).title("Task Title").
@@ -182,21 +197,24 @@ public class TaskManagementControllerTest {
 	}
 
 	@Test
-	public void testGetAllTasksNoData() throws Exception {
+	@SneakyThrows
+	public void testGetAllTasksNoData(){
 		when(taskService.getAllTasks()).thenReturn(null);
 		mockMvc.perform(get("/v1/getAllTasks").contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
 
 	@Test
-	public void testGetAllTasks_Exception() throws Exception {
+	@SneakyThrows
+	public void testGetAllTasks_Exception(){
 		when(taskService.getAllTasks()).thenThrow(new NullPointerException());
 		mockMvc.perform(get("/v1/getAllTasks").contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isInternalServerError());
 	}
 
 	@Test
-	public void testUpdateTask_Exception() throws Exception {
+	@SneakyThrows
+	public void testUpdateTask_Exception(){
 		UpdateTaskRequest updateRequest = new UpdateTaskRequest();
 		updateRequest.setTaskId(103);
 		updateRequest.setDescription("Task Description");
@@ -211,7 +229,8 @@ public class TaskManagementControllerTest {
 	}
 
 	@Test
-	public void testUpdateTask_Success() throws Exception {
+	@SneakyThrows
+	public void testUpdateTask_Success(){
 		UpdateTaskRequest updateRequest = new UpdateTaskRequest();
 		updateRequest.setTaskId(103);
 		updateRequest.setDescription("Task Description");
@@ -228,7 +247,8 @@ public class TaskManagementControllerTest {
 
 
 	@Test
-	public void testUpdateTask_NotFound() throws Exception {
+	@SneakyThrows
+	public void testUpdateTask_NotFound(){
 		UpdateTaskRequest updateRequest = new UpdateTaskRequest();
 		updateRequest.setTaskId(100);
 		updateRequest.setDescription("Task Description");

@@ -1,11 +1,8 @@
 package com.restapp.exception;
 
-public class BadRequest extends RuntimeException{
+public class BadRequest extends Exception{
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3764963575075721886L;
+	private static final long serialVersionUID = -2759657386853888789L;
 
 	public BadRequest(String message) {
 		super(message);

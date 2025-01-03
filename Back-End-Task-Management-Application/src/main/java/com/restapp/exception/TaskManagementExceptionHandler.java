@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import io.swagger.v3.oas.annotations.Hidden;
+
 @RestControllerAdvice
+@Hidden
 public class TaskManagementExceptionHandler {
 	
 	    @ExceptionHandler(MethodArgumentNotValidException.class)

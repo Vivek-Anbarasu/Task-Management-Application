@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 @SpringBootApplication
 @SecurityScheme(name = "Bearer Authentication", scheme = "bearer", bearerFormat = "JWT", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
 public class TaskManagementApplication {
-
+	
 	public static void main(String[] args) {
 		SpringApplication.run(TaskManagementApplication.class, args);
 	}

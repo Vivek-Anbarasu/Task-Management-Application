@@ -41,7 +41,7 @@ public class TaskManagementController{
 	private TaskService taskService;
 
 	@GetMapping(path = "/getTask/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<GetTaskResponse> getTask(@NotNull(message="TaskId is mandatory") @PathVariable("taskId") Integer taskId) {
+	public ResponseEntity<GetTaskResponse> getTask(@NotNull(message="TaskId is mandatory") @PathVariable("taskId") Integer taskId) throws InternalServerError,NotFound {
 		GetTaskResponse getResponse = null;
 		try {
 			getResponse = taskService.getTask(taskId);
@@ -58,7 +58,7 @@ public class TaskManagementController{
 	}
 
 	@PostMapping(path = "/saveTask", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> saveTask(@Valid @RequestBody SaveTaskRequest saveRequest) {
+	public ResponseEntity<String> saveTask(@Valid @RequestBody SaveTaskRequest saveRequest) throws InternalServerError,BadRequest {
 		int taskId;
 		try {
 			Task task = taskService.findByTitle(saveRequest.getTitle());
@@ -82,7 +82,7 @@ public class TaskManagementController{
 	}
 
 	@PutMapping(path = "/updateTask", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> updateTask(@Valid @RequestBody UpdateTaskRequest updateRequest) {
+	public ResponseEntity<String> updateTask(@Valid @RequestBody UpdateTaskRequest updateRequest) throws InternalServerError,NotFound,BadRequest {
 		boolean response = false;
 		try {
 			Task task = taskService.findByTitle(updateRequest.getTitle());
@@ -106,7 +106,7 @@ public class TaskManagementController{
 	}
 
 	@DeleteMapping("/deleteTask/{taskId}")
-	public ResponseEntity<Void> deleteTask(@NotNull(message="TaskId is mandatory") @PathVariable("taskId") Integer taskId) {
+	public ResponseEntity<Void> deleteTask(@NotNull(message="TaskId is mandatory") @PathVariable("taskId") Integer taskId) throws InternalServerError,NotFound {
 		boolean response;
 		GetTaskResponse getResponse = null;
 		try {
@@ -131,7 +131,7 @@ public class TaskManagementController{
 	}
 
 	@GetMapping(path = "/getAllTasks" , produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<GetTaskResponse>> getAllTasks() {
+	public ResponseEntity<List<GetTaskResponse>> getAllTasks() throws InternalServerError, NotFound {
 		List<GetTaskResponse> responseList = null;
 		try {
 			responseList = taskService.getAllTasks();

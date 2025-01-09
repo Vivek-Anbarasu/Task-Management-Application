@@ -2,6 +2,7 @@ package com.vivek.springbatch;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -40,19 +41,6 @@ public class BatchConfig {
           }, transactionManager)
           .build();
     }
-    
-    @Bean
-    public Job jobThree(JobRepository jobRepository, Step stepThree) {
-        return new JobBuilder("jobThree", jobRepository).start(stepThree) .build();
-    }
 
-    @Bean
-    public Step stepThree(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new StepBuilder("stepThree", jobRepository).tasklet((contribution, chunkContext) -> {
-              System.out.println("Superb");
-              return RepeatStatus.FINISHED;
-          }, transactionManager)
-          .build();
-    }
  
 }

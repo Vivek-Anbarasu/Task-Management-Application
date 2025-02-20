@@ -1,26 +1,39 @@
+server:
+   port: 8082
+   
+logging:
+  level:
+    com:
+      zaxxer:
+        hikari:
+          HikariConfig: DEBUG
+          
+management:
+  endpoints:
+    web:
+      exposure:
+        include: metrics
+
 spring:
   batch:
     job:
       enabled: false
     jdbc:
-      initialize-schema: always
-      
-      
-  datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/taskdb
-    username: postgres
-    password: 
+      initialize-schema: never
       
   jpa:
-    hibernate:
-      ddl-auto: update
-      naming:
-         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
-         current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
-         dialect: org.hibernate.dialect.PostgreSQLDialect   
+        jdbc:
+          batchsize: 1000
+        order-inserts: true
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+      naming:
+         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
          
-scheduled:
-  job1: "*/12 * * * * *"
-  job2: "*/20 * * * * *"
+batch:
+  postgres: "0 22 22 * * *"
+  maria: "0 25 22 * * *"

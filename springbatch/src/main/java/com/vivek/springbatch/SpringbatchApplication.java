@@ -5,41 +5,56 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import com.vivek.springbatch.application.MariaDBBatch;
+import com.vivek.springbatch.application.PostGresDBBatch;
+
 @SpringBootApplication
 @EnableScheduling
-public class SpringbatchApplication {
+public class SpringbatchApplication implements ApplicationRunner{
 
 	 @Autowired
-	    private Job jobOne;
+	    private Job  postGresJob;
 
 	    @Autowired
-	    private Job jobTwo;
+	    private Job mariaJob;
 
 	    @Autowired
 	    private JobLauncher jobLauncher;
+	    
+//	    @Autowired
+//	    PostGresDBBatch postGresDBBatch;
+//	    
+//	    @Autowired
+//	    MariaDBBatch mariaDBBatch ;
 
-	    @Scheduled(cron = "${scheduled.job1}")  // Run every 12secs
-	    public void runJob1() throws Exception {
+	    @Scheduled(cron = "${batch.postgres}")  
+	    public void runPostGres() throws Exception {
 	        JobParameters jobParameters = new JobParametersBuilder() .addString("jobID", String.valueOf(System.currentTimeMillis())) .toJobParameters();
-	        System.out.println("Executing sheduled job 1");
-	        jobLauncher.run(jobOne, jobParameters);
+	        jobLauncher.run(postGresJob, jobParameters);
 	    }
 
-	    @Scheduled(cron = "${scheduled.job2}")  // Run every 20secs
-	    public void runJob2() throws Exception {
+	    @Scheduled(cron = "${batch.maria}")  
+	    public void runMaria() throws Exception {
 	        JobParameters jobParameters = new JobParametersBuilder() .addString("jobID", String.valueOf(System.currentTimeMillis())) .toJobParameters();
-	        System.out.println("Executing sheduled job 2");
-	        jobLauncher.run(jobTwo, jobParameters);
+	        jobLauncher.run(mariaJob, jobParameters);
 	    }
 
 	
 	public static void main(String[] args) {
 		SpringApplication.run(SpringbatchApplication.class, args);
+	}
+
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+//		postGresDBBatch.getAllTasks();
+		
 	}
 
 }

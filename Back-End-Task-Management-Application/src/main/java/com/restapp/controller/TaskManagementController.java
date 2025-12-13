@@ -1,21 +1,5 @@
 package com.restapp.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.restapp.dto.GetTaskResponse;
 import com.restapp.dto.SaveTaskRequest;
 import com.restapp.dto.UpdateTaskRequest;
@@ -24,16 +8,23 @@ import com.restapp.exception.BadRequest;
 import com.restapp.exception.InternalServerError;
 import com.restapp.exception.NotFound;
 import com.restapp.service.TaskService;
-
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @SecurityRequirement(name = "Bearer Authentication")
 @RequestMapping("/v1")
-@CrossOrigin(origins = {"http://localhost:3000"})
 @Slf4j
 public class TaskManagementController{
 
@@ -130,6 +121,34 @@ public class TaskManagementController{
 		}
 	}
 
+	
+	@GetMapping("/lock")
+	public void lock() {
+		ExecutorService executor = Executors.newFixedThreadPool(2);
+		executor.execute(updateTask());
+        executor.execute(updateTask());
+		executor.shutdown();
+	}
+	
+	private Runnable updateTask() {
+		return new Runnable() {
+            public void run()
+            {
+            	UpdateTaskRequest updateTaskRequest = new UpdateTaskRequest();
+            	updateTaskRequest.setTaskId(52);
+            	updateTaskRequest.setDescription("Desc");
+            	updateTaskRequest.setTitle("Title");
+            	updateTaskRequest.setStatus("To Do");
+            	try {
+					taskService.updateTask(updateTaskRequest);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+            }
+        };
+	}
+
+	
 	@GetMapping(path = "/getAllTasks" , produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<GetTaskResponse>> getAllTasks() throws InternalServerError, NotFound {
 		List<GetTaskResponse> responseList = null;

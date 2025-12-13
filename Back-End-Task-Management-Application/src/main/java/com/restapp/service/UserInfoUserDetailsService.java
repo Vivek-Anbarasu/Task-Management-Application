@@ -3,7 +3,6 @@ package com.restapp.service;
 import com.restapp.config.UserInfoUserDetails;
 import com.restapp.dao.UserInfoRepository;
 import com.restapp.entity.UserInfo;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

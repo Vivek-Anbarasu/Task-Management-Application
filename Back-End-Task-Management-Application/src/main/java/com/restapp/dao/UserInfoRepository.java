@@ -1,8 +1,7 @@
 package com.restapp.dao;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import com.restapp.entity.UserInfo;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 

@@ -1,10 +1,10 @@
 package com.restapp.validation;
 
-import java.util.Arrays;
-import java.util.List;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class StatusValidationLogic implements ConstraintValidator<StatusValidator, String> {
 

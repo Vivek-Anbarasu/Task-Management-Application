@@ -1,10 +1,9 @@
 package com.restapp.config;
 
+import com.restapp.entity.UserInfo;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import com.restapp.entity.UserInfo;
 
 import java.util.Arrays;
 import java.util.Collection;

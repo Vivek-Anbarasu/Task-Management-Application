@@ -4,7 +4,7 @@ import java.util.Base64;
 
 public class JWTDecoder {
 	public static void main(String[] args) {
-		String[] jwtToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJWaXZlazEgQXlzaHUxIiwiaWF0IjoxNzM1ODg4NzczLCJleHAiOjE3MzU4OTA1NzN9.cfHRTpdKTH_lBwtQ_6yLOJe2VHmZiUQTS4Y6Calg-rz-imOPPkUXxsfoIYP8R0-xMGfxseb5kTPuVAGH_ptkZw"
+		String[] jwtToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJWaXZlazEgQXlzaHUxIiwiaWF0IjoxNzYxMzAzMzE5LCJleHAiOjE3NjEzMDUxMTl9.UP_hS_zfvWgyZnNQSOWS9CmoYoGebJF5Ex4GtHlX6JAS17d38a4PwXl2Mc7j8MkYQtEupVKyLmNmTslmNYlz9w"
 				.split("\\.");
 		Base64.Decoder decoder = Base64.getUrlDecoder();
 		

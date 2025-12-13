@@ -1,13 +1,12 @@
 package com.restapp.service;
 
-import java.util.Optional;
-
+import com.restapp.dao.UserInfoRepository;
+import com.restapp.entity.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.restapp.dao.UserInfoRepository;
-import com.restapp.entity.UserInfo;
+import java.util.Optional;
 
 @Service
 public class RegistrationService {

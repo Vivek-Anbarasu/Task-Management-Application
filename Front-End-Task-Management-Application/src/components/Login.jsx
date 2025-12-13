@@ -8,48 +8,59 @@ import { useNavigate } from 'react-router-dom';
 
 
 export const Login = (props) => {
-    const navigate = useNavigate();
-    localStorage.setItem('accessToken','');
-    localStorage.setItem('userName','');
+  const navigate = useNavigate();
+  localStorage.setItem('accessToken', '');
+  localStorage.setItem('userName', '');
 
-    const loginApplication = async (data) => {
-      try {
-        const response = await axios.post(process.env.REACT_APP_Auth_URL, {username: data.username,password: data.password});
-        localStorage.setItem('accessToken',response.data.accessToken); 
-        localStorage.setItem('userName',data.username); 
+  const loginApplication = async (data) => {
+    try {
+      const response = await axios.post(process.env.REACT_APP_Auth_URL, { username: data.username, password: data.password });
+      const authorizationHeader = response.headers['authorization'];
+      console.log(response);
+      console.log(response.headers);
+      if (authorizationHeader && authorizationHeader.startsWith('Bearer ')) {
+        const token = authorizationHeader.substring(7); // Extract the token after 'Bearer '
+        console.log('Received Bearer Token:', token);
+
+        localStorage.setItem('accessToken', token);
+        localStorage.setItem('userName', data.username);
         toast.success("Successfully Logged In");
-        navigate("/Table"); 
-      } catch (error) {
-        console.log(error);
-        toast.error("Invalid Credentials");
+        navigate("/Table");
+      } else {
+        console.warn('Authorization header not found or not in Bearer format.');
       }
-    };
 
-    const schema = Yup.object().shape({
-        username: Yup.string().required("Please enter your username"),
-        password: Yup.string().required("Please enter your password")
-      });
+    } catch (error) {
+      console.log(error);
+      toast.error("Invalid Credentials");
+    }
+  };
 
-      const { register, handleSubmit, formState: { errors, isDirty, isValid } } = useForm({
-        mode: 'onSubmit',
-        resolver: yupResolver(schema)
-      });
+  const schema = Yup.object().shape({
+    username: Yup.string().required("Please enter your username"),
+    password: Yup.string().required("Please enter your password")
+  });
 
-    return (
-        <div className="auth-form-container"> 
-            <h2>Login</h2>
-            <form className="login-form" onSubmit={handleSubmit(loginApplication)}>
-                <label htmlFor="username">User Name</label>
-                <div className="error-message">{errors.username && <p>{errors.username.message}</p>}</div>
-                <input type="username" placeholder="user name" id="username" name="username" {...register('username')} autoComplete="off" />
-          
-                <label htmlFor="password">Password</label>
-                <div className="error-message">{errors.password && <p>{errors.password.message}</p>}</div>
-                <input  type="password" placeholder="********" id="password" name="password" {...register('password')} />
-                
-                <button type="submit" >Log In</button>
-            </form>
-            <button className="link-btn" onClick={() => props.onFormSwitch('register')}>Don't have an account? Register here.</button>
-        </div>
-    )
+  const { register, handleSubmit, formState: { errors, isDirty, isValid } } = useForm({
+    mode: 'onSubmit',
+    resolver: yupResolver(schema)
+  });
+
+  return (
+    <div className="auth-form-container">
+      <h2>Login</h2>
+      <form className="login-form" onSubmit={handleSubmit(loginApplication)}>
+        <label htmlFor="username">User Name</label>
+        <div className="error-message">{errors.username && <p>{errors.username.message}</p>}</div>
+        <input type="username" placeholder="user name" id="username" name="username" {...register('username')} autoComplete="off" />
+
+        <label htmlFor="password">Password</label>
+        <div className="error-message">{errors.password && <p>{errors.password.message}</p>}</div>
+        <input type="password" placeholder="********" id="password" name="password" {...register('password')} />
+
+        <button type="submit" >Log In</button>
+      </form>
+      <button className="link-btn" onClick={() => props.onFormSwitch('register')}>Don't have an account? Register here.</button>
+    </div>
+  )
 }

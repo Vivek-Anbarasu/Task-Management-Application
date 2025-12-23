@@ -4,6 +4,7 @@ import com.restapp.dto.AuthRequest;
 import com.restapp.entity.UserInfo;
 import com.restapp.service.JWTService;
 import com.restapp.service.RegistrationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequestMapping("/user")
+@Slf4j
 public class UserServicesController {
 
     @Autowired
@@ -32,10 +35,12 @@ public class UserServicesController {
     @PostMapping(path = "/new-registration", produces = MediaType.APPLICATION_JSON_VALUE)
     public String addNewUser(@RequestBody UserInfo userInfo) {
 
-    	Optional<UserInfo> optuserInfo = registrationService.findByName(userInfo.getName());
+        log.info("Registering email: " + userInfo.getEmail());
+
+    	Optional<UserInfo> optuserInfo = registrationService.findByEmail(userInfo.getEmail());
     	
     	if(optuserInfo.isPresent()) {
-    		return "User Name is not available. Please choose another User Name";
+    		return "Email already registered, please use a different email";
     	}
     	
         return registrationService.addUser(userInfo);
@@ -44,16 +49,24 @@ public class UserServicesController {
     @PostMapping(path = "/authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> authenticate(@RequestBody AuthRequest authRequest) {
     	
-    	System.out.println("Request recieved "+authRequest.getUsername());
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+    	System.out.println("Authenticate request recieved for "+authRequest.getEmail());
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
 
-        String jwtToken = jwtService.generateToken(authRequest.getUsername(), authRequest.getPassword());
+        String jwtToken = jwtService.generateToken(authRequest.getEmail());
+        String name = "";
         if(jwtToken != null){
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(jwtToken);
-            return new ResponseEntity<>("Authentication Successful",headers, HttpStatus.OK);
+
+            Optional<UserInfo> optuserInfo = registrationService.findByEmail(authRequest.getEmail());
+
+            if(optuserInfo.isPresent()) {
+                name = optuserInfo.get().getFirstname() +" "+ optuserInfo.get().getLastname();
+            }
+
+            return new ResponseEntity<>(name,headers, HttpStatus.OK);
         }else{
-            return new ResponseEntity<>("Username/Password is not valid",HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Email/Password is not valid",HttpStatus.FORBIDDEN);
         }
 
     }

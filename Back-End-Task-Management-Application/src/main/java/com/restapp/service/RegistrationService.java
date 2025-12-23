@@ -19,8 +19,8 @@ public class RegistrationService {
     private PasswordEncoder passwordEncoder;
 
     
-    public Optional<UserInfo> findByName(String name) {
-    	return repository.findByName(name);
+    public Optional<UserInfo> findByEmail(String name) {
+    	return repository.findByEmail(name);
     }
 
     public String addUser(UserInfo userInfo) {

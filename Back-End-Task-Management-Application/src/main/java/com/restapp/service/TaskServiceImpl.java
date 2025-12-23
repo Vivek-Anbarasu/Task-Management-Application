@@ -40,7 +40,7 @@ public class TaskServiceImpl implements TaskService {
 		if (result.isPresent()) {
 		Task task = result.get();
 		getResponse = GetTaskResponse.builder().
-				taskId(task.getTaskId()).title(task.getTitle()).
+				id(task.getTaskId()).title(task.getTitle()).
 				description(task.getDescription()).status(task.getStatus())
 				.build();
 		}
@@ -58,15 +58,14 @@ public class TaskServiceImpl implements TaskService {
 	@Transactional
 	public boolean updateTask(UpdateTaskRequest updateRequest) throws Exception {
 		System.out.println("Started"+ " "+Thread.currentThread().getName() + "Time: "+ LocalDateTime.now());
-		Optional<Task> result = taskRepository.findById(updateRequest.getTaskId().longValue());
+		Optional<Task> result = taskRepository.findById(updateRequest.getId().longValue());
 		if (result.isPresent()) {
 			Task task = result.get();
 			task.setTitle(updateRequest.getTitle());
-			task.setDescription(Thread.currentThread().getName());
+			task.setDescription(updateRequest.getDescription());
 			task.setStatus(updateRequest.getStatus());
 			taskRepository.save(task);
 			System.out.println("Updated"+ " "+Thread.currentThread().getName()  + "Time: "+ LocalDateTime.now());
-			Thread.sleep(10000); // 10 seconds
 			return true;
 		}
 		return false;
@@ -77,7 +76,7 @@ public class TaskServiceImpl implements TaskService {
 	public List<GetTaskResponse> getAllTasks() throws Exception {
 		List<Task> empList = taskRepository.findAll();
 		 return empList.stream().map(task -> GetTaskResponse.builder().
-					taskId(task.getTaskId()).title(task.getTitle()).
+					id(task.getTaskId()).title(task.getTitle()).
 					description(task.getDescription()).status(task.getStatus())
 					.build()).toList();
 	}

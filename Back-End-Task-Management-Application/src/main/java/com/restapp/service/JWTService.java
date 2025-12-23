@@ -49,13 +49,13 @@ public class JWTService {
     }
 
 
-    public String generateToken(String userName, String password){
+    public String generateToken(String email){
         Map<String,Object> claims=new HashMap<>();
-        return createToken(claims,userName,password);
+        return createToken(claims,email);
     }
 
-    private String createToken(Map<String, Object> claims, String userName, String password) {
-        return Jwts.builder().claims(claims).subject(userName+" "+password).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis()+TOKEN_VALIDITY))
+    private String createToken(Map<String, Object> claims, String userName) {
+        return Jwts.builder().claims(claims).subject(userName).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis()+TOKEN_VALIDITY))
         		.signWith(getSigningKey()).compact();
     }
 

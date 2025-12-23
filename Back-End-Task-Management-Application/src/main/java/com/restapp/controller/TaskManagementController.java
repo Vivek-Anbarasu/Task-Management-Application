@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @SecurityRequirement(name = "Bearer Authentication")
 @RequestMapping("/v1")
 @Slf4j
@@ -75,9 +76,10 @@ public class TaskManagementController{
 	@PutMapping(path = "/updateTask", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> updateTask(@Valid @RequestBody UpdateTaskRequest updateRequest) throws InternalServerError,NotFound,BadRequest {
 		boolean response = false;
+        log.info("Update request received for taskId = " + updateRequest.getId());
 		try {
 			Task task = taskService.findByTitle(updateRequest.getTitle());
-			if (task != null && (task.getTaskId().intValue() != updateRequest.getTaskId().intValue())) {
+			if (task != null && (task.getTaskId().intValue() != updateRequest.getId().intValue())) {
 				log.error("Title already exists: " + updateRequest.getTitle());
 				throw new BadRequest("Title already exists: " + updateRequest.getTitle());
 			} else {
@@ -86,8 +88,8 @@ public class TaskManagementController{
 					log.info("Succesfully Updated: " + updateRequest.getTitle());
 					return new ResponseEntity<>("Successfully Updated", HttpStatus.OK);
 				} else {
-					log.error("No records found for taskId = " + updateRequest.getTaskId());
-					throw new NotFound("No records found for taskId = " + updateRequest.getTaskId());
+					log.error("No records found for taskId = " + updateRequest.getId());
+					throw new NotFound("No records found for taskId = " + updateRequest.getId());
 				}
 			}
 		} catch (Exception e) {
@@ -96,22 +98,23 @@ public class TaskManagementController{
 		}
 	}
 
-	@DeleteMapping("/deleteTask/{taskId}")
-	public ResponseEntity<Void> deleteTask(@NotNull(message="TaskId is mandatory") @PathVariable("taskId") Integer taskId) throws InternalServerError,NotFound {
+	@DeleteMapping("/deleteTask/{id}")
+	public ResponseEntity<Void> deleteTask(@NotNull(message="TaskId is mandatory") @PathVariable("id") Integer id) throws InternalServerError,NotFound {
 		boolean response;
 		GetTaskResponse getResponse = null;
+        log.info("Delete request received for taskId = " + id);
 		try {
-			getResponse = taskService.getTask(taskId);
+			getResponse = taskService.getTask(id);
 			if (getResponse == null) {
-				log.error("No records found for taskId = " + taskId);
-				throw new NotFound("No records found for taskId = " + taskId);
+				log.error("No records found for taskId = " + id);
+				throw new NotFound("No records found for taskId = " + id);
 			} else {
-				response = taskService.deleteTask(taskId);
+				response = taskService.deleteTask(id);
 				if (!response) {
 					log.error("Error in deleteTask");
 					throw new InternalServerError("Error in deleteTask ");
 				}else {
-					log.info("Succesfully Deleted :" + taskId);
+					log.info("Succesfully Deleted :" + id);
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 				}
 			}
@@ -135,7 +138,7 @@ public class TaskManagementController{
             public void run()
             {
             	UpdateTaskRequest updateTaskRequest = new UpdateTaskRequest();
-            	updateTaskRequest.setTaskId(52);
+            	updateTaskRequest.setId(52);
             	updateTaskRequest.setDescription("Desc");
             	updateTaskRequest.setTitle("Title");
             	updateTaskRequest.setStatus("To Do");

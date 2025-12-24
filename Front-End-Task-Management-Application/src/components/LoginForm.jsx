@@ -29,7 +29,7 @@ try {
         console.log('Received Bearer Token:', token);
 
         localStorage.setItem('accessToken', token);
-        localStorage.setItem('email', response.data);
+        localStorage.setItem('name', response.data);
         toast.success("Successfully Logged In");
         navigate('/dashboard');
       

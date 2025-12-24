@@ -2,11 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://127.0.0.1:5432/taskdb
     username: postgres
-    password: 
-    hikari.data-source-properties:
-      ssl: true
-      sslmode: allow
-      sslprotocol: TLSv1.2
+    password: vivek
 
   jpa:
     hibernate:

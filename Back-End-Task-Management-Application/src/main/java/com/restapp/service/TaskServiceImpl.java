@@ -5,12 +5,11 @@ import com.restapp.dao.TaskRepository;
 import com.restapp.dto.GetTaskResponse;
 import com.restapp.dto.SaveTaskRequest;
 import com.restapp.dto.UpdateTaskRequest;
-import com.restapp.entity.Task;
+import com.restapp.entity.Tasks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,24 +23,24 @@ public class TaskServiceImpl implements TaskService {
 	@Override
 	@Transactional
 	public int saveTask(SaveTaskRequest saveRequest) throws Exception {
-		Task task = new Task();
-		task.setTitle(saveRequest.getTitle());
-		task.setDescription(saveRequest.getDescription());
-		task.setStatus(saveRequest.getStatus());
-		Task savedTask = taskRepository.save(task);
-		return savedTask.getTaskId();
+		Tasks tasks = new Tasks();
+		tasks.setTitle(saveRequest.getTitle());
+		tasks.setDescription(saveRequest.getDescription());
+		tasks.setStatus(saveRequest.getStatus());
+		Tasks savedTasks = taskRepository.save(tasks);
+		return savedTasks.getTaskId();
 	}
 
 	@Override
 	@Transactional
 	public GetTaskResponse getTask(Integer taskId) throws Exception{
 		GetTaskResponse getResponse = null;
-		Optional<Task> result = taskRepository.findById(taskId.longValue());
+		Optional<Tasks> result = taskRepository.findById(taskId.longValue());
 		if (result.isPresent()) {
-		Task task = result.get();
+		Tasks tasks = result.get();
 		getResponse = GetTaskResponse.builder().
-				id(task.getTaskId()).title(task.getTitle()).
-				description(task.getDescription()).status(task.getStatus())
+				id(tasks.getTaskId()).title(tasks.getTitle()).
+				description(tasks.getDescription()).status(tasks.getStatus())
 				.build();
 		}
 		return getResponse;
@@ -57,15 +56,13 @@ public class TaskServiceImpl implements TaskService {
 	@Override
 	@Transactional
 	public boolean updateTask(UpdateTaskRequest updateRequest) throws Exception {
-		System.out.println("Started"+ " "+Thread.currentThread().getName() + "Time: "+ LocalDateTime.now());
-		Optional<Task> result = taskRepository.findById(updateRequest.getId().longValue());
+		Optional<Tasks> result = taskRepository.findById(updateRequest.getId().longValue());
 		if (result.isPresent()) {
-			Task task = result.get();
-			task.setTitle(updateRequest.getTitle());
-			task.setDescription(updateRequest.getDescription());
-			task.setStatus(updateRequest.getStatus());
-			taskRepository.save(task);
-			System.out.println("Updated"+ " "+Thread.currentThread().getName()  + "Time: "+ LocalDateTime.now());
+			Tasks tasks = result.get();
+			tasks.setTitle(updateRequest.getTitle());
+			tasks.setDescription(updateRequest.getDescription());
+			tasks.setStatus(updateRequest.getStatus());
+			taskRepository.save(tasks);
 			return true;
 		}
 		return false;
@@ -74,18 +71,18 @@ public class TaskServiceImpl implements TaskService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<GetTaskResponse> getAllTasks() throws Exception {
-		List<Task> empList = taskRepository.findAll();
-		 return empList.stream().map(task -> GetTaskResponse.builder().
-					id(task.getTaskId()).title(task.getTitle()).
-					description(task.getDescription()).status(task.getStatus())
+		List<Tasks> empList = taskRepository.findAll();
+		 return empList.stream().map(tasks -> GetTaskResponse.builder().
+					id(tasks.getTaskId()).title(tasks.getTitle()).
+					description(tasks.getDescription()).status(tasks.getStatus())
 					.build()).toList();
 	}
 
 	
 	@Override
 	@Transactional(readOnly = true)
-	public Task findByTitle(String title) throws Exception {
-		Optional<Task> task = taskRepository.findByTitle(title);
+	public Tasks findByTitle(String title) throws Exception {
+		Optional<Tasks> task = taskRepository.findByTitle(title);
 		  System.out.println("findByTitle ");
 		if(task.isPresent()) {
     		return task.get();

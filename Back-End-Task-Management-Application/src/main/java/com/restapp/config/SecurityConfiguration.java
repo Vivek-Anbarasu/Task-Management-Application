@@ -1,7 +1,7 @@
 package com.restapp.config;
 
-import com.restapp.filter.JwtAuthFilter;
-import com.restapp.service.UserInfoUserDetailsService;
+import com.restapp.filter.JWTFilter;
+import com.restapp.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +30,7 @@ import java.util.List;
 public class SecurityConfiguration {
 	
     @Autowired
-    private JwtAuthFilter authFilter;
+    private JWTFilter authFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -70,7 +70,7 @@ public class SecurityConfiguration {
     
     @Bean
     public UserDetailsService userDetailsService() {
-    	 return new UserInfoUserDetailsService();
+    	 return new UserDetailsServiceImpl();
     }
     
     @Bean

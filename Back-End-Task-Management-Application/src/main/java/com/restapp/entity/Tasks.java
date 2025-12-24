@@ -1,5 +1,6 @@
 package com.restapp.entity;
 
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,18 +11,17 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+
 @Entity
 @Getter @Setter @EqualsAndHashCode 
-public class UserInfo implements Serializable {
-	
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class Tasks implements Serializable {
 
-    private String email;
-    private String password;
-    private String country;
-    private String roles;
-    private String firstname;
-    private String lastname;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer taskId;
+
+	private String title;
+	private String description;
+	private String status;
+
 }

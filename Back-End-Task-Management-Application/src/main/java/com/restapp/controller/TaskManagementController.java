@@ -3,7 +3,7 @@ package com.restapp.controller;
 import com.restapp.dto.GetTaskResponse;
 import com.restapp.dto.SaveTaskRequest;
 import com.restapp.dto.UpdateTaskRequest;
-import com.restapp.entity.Task;
+import com.restapp.entity.Tasks;
 import com.restapp.exception.BadRequest;
 import com.restapp.exception.InternalServerError;
 import com.restapp.exception.NotFound;
@@ -19,8 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -53,8 +51,8 @@ public class TaskManagementController{
 	public ResponseEntity<String> saveTask(@Valid @RequestBody SaveTaskRequest saveRequest) throws InternalServerError,BadRequest {
 		int taskId;
 		try {
-			Task task = taskService.findByTitle(saveRequest.getTitle());
-			if (task != null) {
+			Tasks tasks = taskService.findByTitle(saveRequest.getTitle());
+			if (tasks != null) {
 				log.error("Title already exists: " + saveRequest.getTitle());
 				throw new BadRequest("Title already exists");
 			} else {
@@ -78,8 +76,8 @@ public class TaskManagementController{
 		boolean response = false;
         log.info("Update request received for taskId = " + updateRequest.getId());
 		try {
-			Task task = taskService.findByTitle(updateRequest.getTitle());
-			if (task != null && (task.getTaskId().intValue() != updateRequest.getId().intValue())) {
+			Tasks tasks = taskService.findByTitle(updateRequest.getTitle());
+			if (tasks != null && (tasks.getTaskId().intValue() != updateRequest.getId().intValue())) {
 				log.error("Title already exists: " + updateRequest.getTitle());
 				throw new BadRequest("Title already exists: " + updateRequest.getTitle());
 			} else {
@@ -101,10 +99,9 @@ public class TaskManagementController{
 	@DeleteMapping("/deleteTask/{id}")
 	public ResponseEntity<Void> deleteTask(@NotNull(message="TaskId is mandatory") @PathVariable("id") Integer id) throws InternalServerError,NotFound {
 		boolean response;
-		GetTaskResponse getResponse = null;
         log.info("Delete request received for taskId = " + id);
 		try {
-			getResponse = taskService.getTask(id);
+            GetTaskResponse getResponse = taskService.getTask(id);
 			if (getResponse == null) {
 				log.error("No records found for taskId = " + id);
 				throw new NotFound("No records found for taskId = " + id);
@@ -124,34 +121,6 @@ public class TaskManagementController{
 		}
 	}
 
-	
-	@GetMapping("/lock")
-	public void lock() {
-		ExecutorService executor = Executors.newFixedThreadPool(2);
-		executor.execute(updateTask());
-        executor.execute(updateTask());
-		executor.shutdown();
-	}
-	
-	private Runnable updateTask() {
-		return new Runnable() {
-            public void run()
-            {
-            	UpdateTaskRequest updateTaskRequest = new UpdateTaskRequest();
-            	updateTaskRequest.setId(52);
-            	updateTaskRequest.setDescription("Desc");
-            	updateTaskRequest.setTitle("Title");
-            	updateTaskRequest.setStatus("To Do");
-            	try {
-					taskService.updateTask(updateTaskRequest);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-            }
-        };
-	}
-
-	
 	@GetMapping(path = "/getAllTasks" , produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<GetTaskResponse>> getAllTasks() throws InternalServerError, NotFound {
 		List<GetTaskResponse> responseList = null;

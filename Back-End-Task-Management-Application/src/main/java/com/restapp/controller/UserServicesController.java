@@ -1,6 +1,6 @@
 package com.restapp.controller;
 
-import com.restapp.dto.AuthRequest;
+import com.restapp.dto.AuthenticationRequest;
 import com.restapp.entity.UserInfo;
 import com.restapp.service.JWTService;
 import com.restapp.service.RegistrationService;
@@ -38,27 +38,27 @@ public class UserServicesController {
         log.info("Registering email: " + userInfo.getEmail());
 
     	Optional<UserInfo> optuserInfo = registrationService.findByEmail(userInfo.getEmail());
-    	
+
     	if(optuserInfo.isPresent()) {
     		return "Email already registered, please use a different email";
     	}
-    	
+
         return registrationService.addUser(userInfo);
     }
 
     @PostMapping(path = "/authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> authenticate(@RequestBody AuthRequest authRequest) {
-    	
-    	System.out.println("Authenticate request recieved for "+authRequest.getEmail());
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
+    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest authRequest) {
 
-        String jwtToken = jwtService.generateToken(authRequest.getEmail());
+    	System.out.println("Authenticate request recieved for "+authRequest.email());
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.email(), authRequest.password()));
+
+        String jwtToken = jwtService.generateToken(authRequest.email());
         String name = "";
         if(jwtToken != null){
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(jwtToken);
 
-            Optional<UserInfo> optuserInfo = registrationService.findByEmail(authRequest.getEmail());
+            Optional<UserInfo> optuserInfo = registrationService.findByEmail(authRequest.email());
 
             if(optuserInfo.isPresent()) {
                 name = optuserInfo.get().getFirstname() +" "+ optuserInfo.get().getLastname();
@@ -73,7 +73,7 @@ public class UserServicesController {
     
 //    @PostMapping(path = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
 //    public AuthResponse refreshToken(@RequestHeader("Token") String jwtToken) {
-//    	String subject = jwtService.extractSubject(jwtToken);
+//    	String subject = jwtService.extractEmail(jwtToken);
 //    	String creds[] = subject.split(" ");
 //    	AuthRequest authRequest = new AuthRequest();
 //    	authRequest.setUsername(creds[0]);

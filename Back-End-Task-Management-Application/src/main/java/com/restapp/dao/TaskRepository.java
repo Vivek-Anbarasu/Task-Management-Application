@@ -1,6 +1,6 @@
 package com.restapp.dao;
 
-import com.restapp.entity.Task;
+import com.restapp.entity.Tasks;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -9,13 +9,13 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface TaskRepository extends JpaRepository<Task, Long>{
+public interface TaskRepository extends JpaRepository<Tasks, Long>{
 
-	Optional<Task> findByTitle(String title);
+	Optional<Tasks> findByTitle(String title);
 	 
 	 @Lock(LockModeType.PESSIMISTIC_WRITE)
-	 Task save(Task task);
+     Tasks save(Tasks tasks);
 	 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-	 Optional<Task> findById(Long id);
+	 Optional<Tasks> findById(Long id);
 }
